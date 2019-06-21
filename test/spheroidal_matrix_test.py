@@ -1,10 +1,10 @@
 import unittest
-from spheroidal import *
+from scikits.scattpy.spheroidal import *
 
 #tests without using derivatives
 #prolate spheroid
-from spheroidal_particles import TMInputWave, Spheroid
-from spheroidal_svm import *
+from scikits.scattpy.spheroidal_particles import TMInputWave, Spheroid
+from scikits.scattpy.spheroidal_svm import *
 
 class testSpheroidalMatrixA(unittest.TestCase):
 

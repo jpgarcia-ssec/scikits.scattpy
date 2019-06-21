@@ -1,4 +1,4 @@
-import spheroidal
+from . import spheroidal
 
 from numpy import pi, real, power, cos, absolute
 

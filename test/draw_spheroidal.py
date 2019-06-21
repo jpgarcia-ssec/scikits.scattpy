@@ -1,8 +1,8 @@
 import time
 
 import matplotlib
-from spheroidal_ebcm import SpheroidalEBCM
-from spheroidal_pmm import SpheroidalPMM
+from scikits.scattpy.spheroidal_ebcm import SpheroidalEBCM
+from scikits.scattpy.spheroidal_pmm import SpheroidalPMM
 
 matplotlib.use('Agg')
 
@@ -12,9 +12,9 @@ import numpy as np
 from pylab import load
 from pylab import save
 
-from spheroidal import *
-from spheroidal_particles import *
-from properties import *
+from scikits.scattpy.spheroidal import *
+from scikits.scattpy.spheroidal_particles import *
+from scikits.scattpy.properties import *
 
 import sys
 
@@ -37,7 +37,7 @@ def generate_data(a_b,xl,type):
 
     for i in range(n_min,n_max,2):
         nmax = i
-        print nmax
+        print(nmax)
         start = time.time()
         svm = SpheroidalSVM(particle,nmax)
         b_sca = svm.getSolution(TMInputWave(alpha))[0]
@@ -55,7 +55,7 @@ def generate_data(a_b,xl,type):
 
     for i in range(n_min,n_max,2):
         nmax = i
-        print nmax
+        print(nmax)
         start = time.time()
         ebcm = SpheroidalEBCM(particle,nmax)
         b_sca = ebcm.getMatrixSolution(TMInputWave(alpha))[0]
@@ -73,7 +73,7 @@ def generate_data(a_b,xl,type):
 
     for i in range(n_min,n_max,2):
         nmax = i
-        print nmax
+        print(nmax)
         start = time.time()
         ebcm = SpheroidalEBCM(particle,nmax)
         b_sca = ebcm.getSolution(TMInputWave(alpha))[0]
@@ -91,7 +91,7 @@ def generate_data(a_b,xl,type):
 
 #    for i in range(n_min,n_max,2):
 #        nmax = i
-#        print nmax
+#        print(nmax)
 #        start = time.time()
 #        pmm = SpheroidalPMM(particle,c2,c1,nmax)
 #        b_sca = pmm.getMatrixSolution(TMInputWave(alpha))[0]
@@ -109,7 +109,7 @@ def generate_data(a_b,xl,type):
 #
 #    for i in range(n_min,n_max,2):
 #        nmax = i
-#        print nmax
+#        print(nmax)
 #        start = time.time()
 #        pmm = SpheroidalPMM(particle,c2,c1,nmax)
 #        b_sca = pmm.getSolution(TMInputWave(alpha))[0]

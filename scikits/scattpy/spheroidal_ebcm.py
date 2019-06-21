@@ -2,10 +2,10 @@ from numpy import zeros, asarray, mat
 import scipy
 import scipy.linalg
 
-from spheroidal_functions import *
+from .spheroidal_functions import *
 
-import spheroidal
-from spheroidal_svm import SpheroidalSVM
+from . import spheroidal
+from .spheroidal_svm import SpheroidalSVM
 
 
 class SpheroidalEBCM:

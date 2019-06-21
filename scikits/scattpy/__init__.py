@@ -1,7 +1,7 @@
 """ScattPy is a SciKits package providing numerical methods of solving
 light scattering by non-spherical particles problem."""
-from methods import svm, ebcm, pmm
-from laboratory import\
+from .methods import svm, ebcm, pmm
+from .laboratory import\
 Shape,\
 ShapeSphere,\
 ShapeSpheroid,\
@@ -21,5 +21,5 @@ EMT_MGarn_Particle,\
 EMT_IMGarn_Particle,\
 EMT_Brugg_Particle,\
 Lab
-from version import __version__
+from .version import __version__
 

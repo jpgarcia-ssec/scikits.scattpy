@@ -4,8 +4,8 @@ import scipy.linalg
 
 from scipy.special import *
 
-from spheroidal import *
-from spheroidal_particles import Spheroid
+from scikits.scattpy.spheroidal import *
+from scikits.scattpy.spheroidal_particles import Spheroid
 
 class testSpheroidalProlateNorm(unittest.TestCase):
     numpy.seterr('print')

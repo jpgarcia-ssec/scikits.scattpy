@@ -1,6 +1,6 @@
 __author__ = 'maxal'
 
-import f_radial
+from scikits.scattpy import f_radial
 
 
 kob = 0
@@ -14,4 +14,4 @@ R1d = 0
 R2f =0
 R2d = 0
 
-print f_radial.rad_fun(kob, m, n, c, ksi, eps)[0]
+print(f_radial.rad_fun(kob, m, n, c, ksi, eps)[0])

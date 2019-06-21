@@ -1,6 +1,6 @@
 from numpy import *
 #import core
-import laboratory
+from . import laboratory
 from scipy import sparse
 #from scipy.sparse.linalg.dsolve import linsolve
 import pdb
@@ -8,7 +8,7 @@ import pdb
 #from IPython.Shell import IPShellEmbed; ishell = IPShellEmbed()
 #import pylab
 #import plotting
-import spherical
+from . import spherical
 
 delta_c = 1e-16
 ngauss_coef = 6
@@ -34,9 +34,9 @@ class Results:
 def methods_factory(meth_bnd_system):
     def meth(lab, nrange=None, accuracy=1e-10, accuracy_criteria=None, ngauss=200, conv_stop=True, conv_test=False,
              iterative=True):
-        print "\n", "*" * 60
-        print lab
-        print "*" * 60
+        print("\n", "*".join(['' for x in range(60)]))
+        print(lab)
+        print("*".join(['' for x in range(60)]))
 
         if conv_test:
             nrange = svm_test_M0(lab, nrange, accuracy, ngauss, conv_stop, iterative)
@@ -46,8 +46,8 @@ def methods_factory(meth_bnd_system):
 
         # get nrange
         global nrange_default
-        if nrange == None:
-            if lab.particle.layers[0].shape.nrange == None:
+        if nrange is None:
+            if lab.particle.layers[0].shape.nrange is None:
                 nrange = nrange_default
             else:
                 nrange = lab.particle.layers[0].shape.nrange
@@ -64,13 +64,13 @@ def methods_factory(meth_bnd_system):
         errors_tm = False
         errors_te = False
 
-        print "N \t\t err TM\t\t err TE"
+        print("N \t\t err TM\t\t err TE")
         for ni, n in enumerate(nrange[1:]):
             try:
                 Cext_tm_n, c_sca_tm_n, Cext_te_n, c_sca_te_n\
                 = meth_n(meth_bnd_system, lab, n, ngauss, Ms, iterative)
-            except linalg.linalg.LinAlgError, e:
-                print "Terminating: '" + str(e) + "' error received"
+            except linalg.linalg.LinAlgError as e:
+                print("Terminating: '" + str(e) + "' error received")
                 break
             delta_tm_n = abs(Cext_tm_n - Cext_tm_p) / Cext_tm_n
             delta_te_n = abs(Cext_te_n - Cext_te_p) / Cext_te_n
@@ -79,14 +79,14 @@ def methods_factory(meth_bnd_system):
             convlog_tm['delta'].append(delta_tm_n)
             convlog_te['N'].append(n)
             convlog_te['delta'].append(delta_te_n)
-            print "%(n)s\t\t%(delta_tm_n) 5.1e\t%(delta_te_n) 5.1e"\
-            % locals()
+            print("%(n)s\t\t%(delta_tm_n) 5.1e\t%(delta_te_n) 5.1e"\
+            % locals())
 
             if Cext_tm_n < 0: errors_tm = True
             if Cext_te_n < 0: errors_te = True
 
             if conv_stop and errors_tm and errors_te:
-                print "Terminating: no more convergence expected"
+                print("Terminating: no more convergence expected")
                 break
 
             if 0 < delta_tm_n < delta_tm:
@@ -102,13 +102,13 @@ def methods_factory(meth_bnd_system):
             if conv_stop and\
                delta_tm < 1e-2 and delta_tm_n / delta_tm > 1e2 and\
                delta_te < 1e-2 and delta_te_n / delta_te > 1e2:
-                print "Terminating: no more convergence expected"
+                print("Terminating: no more convergence expected")
                 break
 
-            if not accuracy == None and\
+            if not accuracy is None and\
                delta_tm >= 0 and delta_te >= 0 and\
                delta_tm + delta_te < accuracy:
-                print "Terminating: accuracy limit obtained"
+                print("Terminating: accuracy limit obtained")
                 break
 
             Cext_tm_p = Cext_tm_n
@@ -116,12 +116,12 @@ def methods_factory(meth_bnd_system):
             if conv_stop and\
                (Cext_tm_n < 0 or Cext_te_n < 0) and\
                delta_tm + delta_te < 2e-2:
-                print "Terminating: no more convergence expected"
+                print("Terminating: no more convergence expected")
                 break
 
             if conv_stop and\
                ni > 10 and (delta_tm + delta_te > 1e-2):
-                print "Terminating: no more convergence expected"
+                print("Terminating: no more convergence expected")
                 break
 
 
@@ -133,9 +133,9 @@ def methods_factory(meth_bnd_system):
         n_tm = len(c_sca_tm[0])
         n_te = len(c_sca_te[0])
 
-        print "TM mode: Qext=%(Qext_tm)20.16e , Qsca=%(Qsca_tm)20.16e, delta=%(delta_tm)5.1e , n=%(n_tm)s" % locals()
+        print("TM mode: Qext=%(Qext_tm)20.16e , Qsca=%(Qsca_tm)20.16e, delta=%(delta_tm)5.1e , n=%(n_tm)s" % locals())
 
-        print "TE mode: Qext=%(Qext_te)20.16e , Qsca=%(Qsca_te)20.16e, delta=%(delta_te)5.1e , n=%(n_te)s" % locals()
+        print("TE mode: Qext=%(Qext_te)20.16e , Qsca=%(Qsca_te)20.16e, delta=%(delta_te)5.1e , n=%(n_te)s" % locals())
 
         global RESULTS
         RESULTS = Results(c_sca_te, delta_te, N_te, convlog_te,\
@@ -162,7 +162,7 @@ def meth_n(meth_bnd_system, lab, n, ngauss, ms=None, iterative=True):
         c_sca_te.append(zeros(n))
     else:
         if not ms:
-            ms = xrange(n + 1)
+            ms = range(n + 1)
 
     for m in ms:
         # Instead of m=0 we start with m=-1 (axisymmetric part)
@@ -468,7 +468,7 @@ def get_Bs_Br(bnd, Jn1, Jn2, Hn1, Pn):
     k1 = bnd.k1
     k2 = bnd.k2
     e12 = bnd.e12
-    for k in xrange(len(core.weights)):
+    for k in range(len(core.weights)):
         jn1 = Jn1[k, 0, 1:]
         jdn1 = Jn1[k, 1, 1:]
         jn2 = Jn2[k, 0, 1:]
@@ -498,9 +498,9 @@ def get_Bs_Br(bnd, Jn1, Jn2, Hn1, Pn):
 
 
 def meth_test_M0(meth_bnd_system, lab, nrange, accuracy=None, ngauss="auto", conv_stop=True, iterative=True):
-    print "\n", "*" * 60
-    print "Convergence test: axisymmetric part"
-    print "*" * 60
+    print("\n", "*".join(['' for x in range(60)]))
+    print("Convergence test: axisymmetric part")
+    print("*".join(['' for x in range(60)]))
 
     convlog_te = {'N': [], 'delta': []}
     convlog_tm = {'N': [], 'delta': []}
@@ -515,13 +515,13 @@ def meth_test_M0(meth_bnd_system, lab, nrange, accuracy=None, ngauss="auto", con
     nrange_tm = list(nrange)[0:1]
     nrange_te = list(nrange)[0:1]
 
-    print "N \t err TM\t err TE"
+    print("N \t err TM\t err TE")
     for n in nrange[1:]:
         try:
             Cext_tm_n, c_sca_tm_n, Cext_te_n, c_sca_te_n\
             = svm_n(lab, n, ngauss, Ms, iterative)
-        except linalg.linalg.LinAlgError, e:
-            print "Terminating: '" + str(e) + "' error received"
+        except linalg.linalg.LinAlgError as e:
+            print("Terminating: '" + str(e) + "' error received")
             break
         delta_tm_n = abs(Cext_tm_n - Cext_tm_p) / Cext_tm_n
         delta_te_n = abs(Cext_te_n - Cext_te_p) / Cext_te_n
@@ -530,8 +530,8 @@ def meth_test_M0(meth_bnd_system, lab, nrange, accuracy=None, ngauss="auto", con
         convlog_tm['delta'].append(delta_tm_n)
         convlog_te['N'].append(n)
         convlog_te['delta'].append(delta_te_n)
-        print "%(n)s\t\t%(delta_tm_n) 5.1e\t%(delta_te_n) 5.1e"\
-        % locals()
+        print("%(n)s\t\t%(delta_tm_n) 5.1e\t%(delta_te_n) 5.1e"\
+        % locals())
 
         nrange_tm += [n]
         nrange_te += [n]
@@ -549,12 +549,12 @@ def meth_test_M0(meth_bnd_system, lab, nrange, accuracy=None, ngauss="auto", con
         if conv_stop and\
            delta_tm < 1e-3 and delta_tm_n / delta_tm > 1e2 and\
            delta_te < 1e-3 and delta_te_n / delta_te > 1e2:
-            print "Terminating: no more convergence expected"
+            print("Terminating: no more convergence expected")
             break
 
-        if not accuracy == None:
+        if not accuracy is None:
             if delta_tm + delta_te < accuracy:
-                print "Terminating: required accuracy obtained"
+                print("Terminating: required accuracy obtained")
                 break
 
         Cext_tm_p = Cext_tm_n
@@ -568,22 +568,22 @@ def meth_test_M0(meth_bnd_system, lab, nrange, accuracy=None, ngauss="auto", con
     n_tm = len(c_sca_tm[0])
     n_te = len(c_sca_te[0])
 
-    print "TM mode: Qext=%(Qext_tm)20.16e , Qsca=%(Qsca_tm)20.16e, delta=%(delta_tm)5.1e , n=%(n_tm)s" % locals()
+    print( "TM mode: Qext=%(Qext_tm)20.16e , Qsca=%(Qsca_tm)20.16e, delta=%(delta_tm)5.1e , n=%(n_tm)s" % locals())
 
-    print "TE mode: Qext=%(Qext_te)20.16e , Qsca=%(Qsca_te)20.16e, delta=%(delta_te)5.1e , n=%(n_te)s" % locals()
+    print( "TE mode: Qext=%(Qext_te)20.16e , Qsca=%(Qsca_te)20.16e, delta=%(delta_te)5.1e , n=%(n_te)s" % locals())
 
-    print list(unique1d(list(nrange_tm) + list(nrange_te)))
-    print nrange_tm, nrange_te
+    print( list(unique1d(list(nrange_tm) + list(nrange_te))))
+    print( nrange_tm, nrange_te)
     return list(unique1d(list(nrange_tm) + list(nrange_te)))
 
 
-def test_svm(nr=xrange(4, 50, 2), ngauss=80):
+def test_svm(nr=range(4, 50, 2), ngauss=80):
     ptcl = laboratory.SpheroidHom(ab, xv, m2)
     lab = laboratory.Lab(ptcl, alpha)
     svm(lab)
 
 
-def test_cheb(nr=xrange(5, 50, 5), ngauss=80):
+def test_cheb(nr=range(5, 50, 5), ngauss=80):
     ptcl = laboratory.ChebParticleHom(5, eps, xv, m2)
     lab = laboratory.Lab(ptcl, alpha)
     svm(lab)
@@ -600,7 +600,7 @@ pmm0 = methods_factory(pmm_bnd_system)
 
 def pmm(lab, nrange=None, accuracy=1e-10, accuracy_criteria=None, ngauss=200, conv_stop=True, conv_test=False,
         iterative=True):
-    print "Warning: layered structures aren't supported"
-    print "Warning: TE mode isn't supported"
+    print("Warning: layered structures aren't supported")
+    print("Warning: TE mode isn't supported")
     return pmm0(lab, nrange, accuracy, accuracy_criteria, ngauss, conv_stop, conv_test, iterative)
 

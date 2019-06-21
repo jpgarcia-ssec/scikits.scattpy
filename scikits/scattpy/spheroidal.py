@@ -2,7 +2,7 @@ import scipy.integrate
 
 from scipy import *
 
-from spheroidal_svm import *
+from .spheroidal_svm import *
 
 #quad integration for complex numbers
 def quad(func, a, b, **kwargs):

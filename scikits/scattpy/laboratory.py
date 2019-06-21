@@ -1,11 +1,11 @@
-import core
+from . import core
 from numpy import *
-from scipy.special import sph_jn, sph_jnyn, lpmn
-from scipy.misc.common import factorial
+from .core import sph_jn, sph_jnyn, lpmn
+from scipy.special import factorial
 #from IPython.Debugger import Tracer; debug_here = Tracer()
 #from scipy.misc import derivative
 from numdifftools import Derivative
-from doc_inherit import doc_inherit
+from .doc_inherit import doc_inherit
 
 class Shape(object):
     """Shape class, base for all particle shapes"""
@@ -55,7 +55,7 @@ class ShapeSphere(Shape):
         return zeros_like(theta)
 
     def copy(self):
-        return self.__class__(self.xv)
+        return type(self)(self.xv)
 
 
 class ShapeSpheroid(Shape):
@@ -74,7 +74,7 @@ class ShapeSpheroid(Shape):
         return "%(type)s spheroid with ab=%(ab)s, xv=%(xv)s" % self.__dict__
 
     def copy(self):
-        return self.__class__(self.ab, self.xv, self.prolate)
+        return type(self)(self.ab, self.xv, self.prolate)
 
     @doc_inherit
     def R(self, theta):
@@ -126,7 +126,7 @@ class ShapeChebyshev(Shape):
         return "Chebyshev particle with N=%(N)s eps=%(eps)s, xv=%(xv)s" % self.__dict__
 
     def copy(self):
-        return self.__class__(self.N, self.eps, self.xv)
+        return type(self)(self.N, self.eps, self.xv)
 
     @doc_inherit
     def _R(self, theta):
@@ -167,14 +167,15 @@ class Particle(object):
             s = "homogeneous " + str(self.layers[0]) + "\n"
         else:
             s = ""
-            for l in xrange(Nlays):
+            for l in range(Nlays):
                 s += "layer " + str(l) + ": " + str(self.layers[l]) + "\n"
         return s
 
     def copy(self):
         kwargs = self.copy_args
         if 'self' in kwargs: del kwargs['self']
-        return self.__class__(**kwargs)
+        if '__class__' in kwargs: del kwargs['__class__']
+        return type(self)(**kwargs)
 
     layers = []
 
@@ -206,7 +207,7 @@ class Sphere(HomogeneousParticle):
     """Homogeneous spherical particle"""
 
     def __init__(self, xv, m):
-        super(self.__class__, self).__init__(ShapeSphere, {'xv': xv}, m)
+        super(Sphere, self).__init__(ShapeSphere, {'xv': xv}, m)
         self.copy_args = locals()
 
 
@@ -214,7 +215,7 @@ class ProlateSpheroid(HomogeneousParticle):
     """Homogeneous prolate spheroidal particle"""
 
     def __init__(self, ab, xv, m):
-        super(self.__class__, self).\
+        super(ProlateSpheroid, self).\
         __init__(ShapeSpheroid, {'ab': ab, 'xv': xv, 'prolate': True}, m)
         self.copy_args = locals()
 
@@ -223,7 +224,7 @@ class OblateSpheroid(HomogeneousParticle):
     """Homogeneous oblate spheroidal particle"""
 
     def __init__(self, ab, xv, m):
-        super(self.__class__, self).\
+        super(OblateSpheroid, self).\
         __init__(ShapeSpheroid, {'ab': ab, 'xv': xv, 'prolate': False}, m)
         self.copy_args = locals()
 
@@ -232,7 +233,7 @@ class ChebParticle(HomogeneousParticle):
     """Homogeneous Chebyshev particle"""
 
     def __init__(self, N, eps, xv, m):
-        super(self.__class__, self).\
+        super(ChebParticle, self).\
         __init__(ShapeChebyshev, {'N': N, 'eps': eps, 'xv': xv}, m)
         self.copy_args = locals()
 
@@ -278,11 +279,11 @@ class Layered_EqShape_Particle(Particle):
         Nseries = int(ceil(Nlayers / (series_len + 0.)))
         Nlayers1 = Nseries * series_len
         if not Nlayers == Nlayers1:
-            print "Updating number of layers"\
+            print("Updating number of layers"\
                   + " from " + str(Nlayers)\
                   + " to " + str(Nlayers1) + "\n"\
                   + " to match " + str(Nseries) + " series"\
-                  + " of " + str(series_len) + " layers."
+                  + " of " + str(series_len) + " layers.")
             Nlayers = Nlayers1
 
         self.layers = []
@@ -300,7 +301,7 @@ class Layered_EqShape_Particle(Particle):
         volumes = volumes / (sum(volumes) + 0.) #normalize volume fract-s
         self.ms = ms
         self.volumes = volumes * 100
-        for i in xrange(series_len):
+        for i in range(series_len):
             coefs[i] = sum(volumes[i:])
 
         serie_no = 0
@@ -308,7 +309,7 @@ class Layered_EqShape_Particle(Particle):
         params1 = params.copy()
         while len(self.layers) < Nlayers:
             serie_no = serie_no + 1
-            for i in xrange(series_len):
+            for i in range(series_len):
                 m = ms[i]
                 l = l + 1
                 if l > 1:
@@ -350,7 +351,7 @@ class Layered_EqShapeEqVol_Particle(Layered_EqShape_Particle):
     def __init__(self, shape0, params, ms, Nlayers):
         copy_args = locals()
         volumes = zeros(len(ms)) + 1
-        super(self.__class__, self)\
+        super(Layered_EqShapeEqVol_Particle, self)\
         .__init__(shape0, params, ms, volumes, Nlayers)
         self.copy_args = copy_args
 
@@ -366,7 +367,7 @@ class EMT_Particle(HomogeneousParticle):
         self.ms = ms
         self.volumes = volumes / (sum(volumes) + 0.) * 100
         m_mixed = self.mixing_rule(ms, volumes)
-        super(self.__class__, self).__init__(shape, params, m_mixed)
+        super(EMT_Particle, self).__init__(shape, params, m_mixed)
         self.copy_args = copy_args
 
     def __str__(self):
@@ -482,7 +483,7 @@ class LayeredConfocalSpheroid(Layered_EqShape_Particle):
     def __init__(self, ab, xv, ms, volumes, Nlayers, prolate=True):
         copy_args = locals()
         params = {'ab': ab, 'xv': xv, 'prolate': prolate}
-        super(self.__class__, self)\
+        super(LayeredConfocalSpheroid, self)\
         .__init__(ShapeSpheroid, params, ms, volumes, Nlayers)
         self.copy_args = copy_args
         if self.Nlayers > 1:
@@ -572,12 +573,12 @@ class Lab:
 
     def boundaries(self):
         """Iterator for boundaries"""
-        for l in xrange(len(self.particle.layers)):
+        for l in range(len(self.particle.layers)):
             yield self.boundary(l)
 
     def boundaries_reversed(self):
         """Reversed iterator of boundaries"""
-        for l in reversed(xrange(len(self.particle.layers))):
+        for l in reversed(range(len(self.particle.layers))):
             yield self.boundary(l)
 
     def get_inc(self, n, m, axisymm=False):
@@ -605,7 +606,7 @@ class Lab:
     def get_Cext(self, c_sca):
         """Return extinction cross-section Cext and efficiency factor Qext"""
         Cext = self.get_Cext_m(1, c_sca[0], True)
-        for m in xrange(1, len(c_sca)):
+        for m in range(1, len(c_sca)):
             Cext += self.get_Cext_m(m, c_sca[m], False)
 
         g = self.particle.g
@@ -623,7 +624,7 @@ class Lab:
             l = arange(1, n + 1)
             Cext = sum((1j ** (-l) * c_sca).real * Pna)
         else:
-            n = len(c_sca) / 2 + m - 1
+            n = len(c_sca) // 2 + m - 1
             Pna = self.Pna[m, m:n + 1]
             Pdna = self.Pdna[m, m:n + 1]
             a = c_sca[:n - m + 1]
@@ -642,7 +643,7 @@ class Lab:
     def get_Csca(self, c_sca):
         """Return scattering cross-section Csca and efficiency factor Qsca"""
         Csca = self.get_Csca_m(1, c_sca[0], True)
-        for m in xrange(1, len(c_sca)):
+        for m in range(1, len(c_sca)):
             Csca += self.get_Csca_m(m, c_sca[m], False)
 
         g = self.particle.g
@@ -658,7 +659,7 @@ class Lab:
             l = arange(1, n + 1)
             Csca = 4 * sum(abs(c_sca) ** 2 * l * (l + 1) / (2 * l + 1.))
         else:
-            n = len(c_sca) / 2 + m - 1
+            n = len(c_sca) // 2 + m - 1
             a = c_sca[:n - m + 1]
             b = c_sca[n - m + 1:]
             l = arange(m, n + 1)
@@ -691,7 +692,7 @@ class Lab:
         A2 = zeros_like(A1)
         sinT = sin(self.alpha + Theta)
         cosT = cos(self.alpha + Theta)
-        for m in xrange(1, ms):
+        for m in range(1, ms):
             PnT = P[:, 0, m, m:]
             PdnT = P[:, 1, m, m:]
             l = arange(m, n + 1)
@@ -733,9 +734,9 @@ class Lab:
         vX = zeros_like(X) + .0
         vY = zeros_like(X) + .0
         vZ = zeros_like(X) + .0
-        for i in xrange(size(X, 0)):
-            for j in xrange(size(Y, 1)):
-                for k in xrange(size(Z, 2)):
+        for i in range(size(X, 0)):
+            for j in range(size(Y, 1)):
+                for k in range(size(Z, 2)):
                     cPoint = array([X[i, j, k], Y[i, j, k], Z[i, j, k]])
                     sPoint = core.coord_cartesian2spherical(cPoint)
                     r, t, p = list(sPoint)

@@ -1,8 +1,8 @@
 import unittest
 
-from spheroidal import *
-from spheroidal_particles import *
-from properties import *
+from scikits.scattpy.spheroidal import *
+from scikits.scattpy.spheroidal_particles import *
+from scikits.scattpy.properties import *
 
 #main integration tests for non-absorbing particle
 class testSVM(unittest.TestCase):
@@ -93,19 +93,19 @@ class testSVM(unittest.TestCase):
         alpha = pi / 4
         particle = self.particle
         particle.set_xl(1)
-        print "c1=" + str(particle.c1)
-        print "c2=" + str(particle.c2)
-        print "d=" + str(particle.d)
-        print "eps="+str(particle.eps)
-        print "psi="+str(particle.psi)
+        print("c1=" + str(particle.c1))
+        print("c2=" + str(particle.c2))
+        print("d=" + str(particle.d))
+        print("eps="+str(particle.eps))
+        print("psi="+str(particle.psi))
         nmax = 8
         svm = SpheroidalSVM(particle,nmax)
         b_sca = svm.getSolution(TMInputWave(alpha))[0]
         C_ext = getCext(particle, alpha, b_sca, nmax)[0]
         C_sca = getCsca(particle, b_sca, nmax)[0]
-        print C_ext, C_sca
+        print(C_ext, C_sca)
         delta = (C_ext-C_sca)/(C_ext+C_sca)
-        print delta
+        print(delta)
         self.assertAlmostEqual(delta,0,5)
         self.assertAlmostEqual(C_ext,C_sca,5)
         self.assertTrue(C_ext>0.)
@@ -115,15 +115,15 @@ class testSVM(unittest.TestCase):
         alpha = pi / 4
         particle = self.particle
         particle.set_xl(3.0)
-        print " c1=" + str(particle.c1) + " c2=" + str(particle.c2) + " eps=" + str(particle.eps) + " psi=" + str(particle.psi) + " d="+str(particle.d)
+        print(" c1=" + str(particle.c1) + " c2=" + str(particle.c2) + " eps=" + str(particle.eps) + " psi=" + str(particle.psi) + " d="+str(particle.d))
         nmax = 6
         svm = SpheroidalSVM(particle,nmax)
         b_sca = svm.getSolution(TMInputWave(alpha))[0]
         C_ext = getCext(particle, alpha, b_sca, nmax)[0]
         C_sca = getCsca(particle, b_sca, nmax)[0]
-        print C_ext, C_sca
+        print(C_ext, C_sca)
         delta = (C_ext-C_sca)/(C_ext+C_sca)
-        print delta
+        print(delta)
         self.assertAlmostEqual(delta,0,5)
         self.assertAlmostEqual(C_ext,C_sca,5)
         self.assertTrue(C_ext>0.)

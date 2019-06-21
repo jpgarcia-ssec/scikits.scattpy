@@ -1,12 +1,22 @@
 # Core functions
 from numpy import *
-from scipy.special import sph_jn, sph_jnyn, lpmn
-from scipy.misc.common import factorial
+from scipy.special import spherical_jn,spherical_yn,lpmn
+from scipy.special import factorial
 from math import atan, acos, asin
 #from IPython.Debugger import Tracer; debug_here = Tracer()
 
-Pna = 0
+def sph_jn(n,z):
+    a=[spherical_jn(np,z,derivative=False) for np in range(0,n+1)]
+    b=[spherical_jn(np,z,derivative=True) for np in range(0,n+1)]
+    return a,b
 
+def sph_jnyn(n,z):
+    a,b=sph_jn(n,z)
+    c=[spherical_yn(np,z,derivative=False) for np in range(0,n+1)]
+    d=[spherical_yn(np,z,derivative=True) for np in range(0,n+1)]
+    return a,b,c,d
+
+Pna = 0
 
 def get_Pmn(m, n, x):
     return array([lpmn(m, n, xl) for xl in x])

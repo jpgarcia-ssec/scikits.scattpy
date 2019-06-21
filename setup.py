@@ -19,7 +19,7 @@ MAINTAINER          = 'Alexander Vinokurov'
 MAINTAINER_EMAIL    = 'scattpy@googlegroups.com'
 URL                 = 'http://scattpy.github.com'
 LICENSE             = 'BSD'
-VERSION             = '0.1.2'
+VERSION             = '0.2.0'
 DOWNLOAD_URL        = 'http://github.com/downloads/ScattPy/scikits.scattpy/scikits.scattpy-'+VERSION+'.tar.gz'
 
 import setuptools
@@ -62,9 +62,9 @@ def configuration(parent_package='', top_path=None, package_name=DISTNAME):
 
     config.add_extension('f_radial',
         sources=[os.path.join('src', 'radial.for')],
-        library_dirs=["lib"],
-        libraries=["radial"]
+        libraries=['radial']
     )
+    config.add_library('radial',sources=[os.path.join('src', 'lib.for')])
 
     return config
 

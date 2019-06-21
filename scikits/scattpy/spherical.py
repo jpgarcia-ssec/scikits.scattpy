@@ -1,7 +1,7 @@
 from numpy import *
 from scipy.special.orthogonal import ps_roots
-from scipy import special
-import f_utils
+from .core import sph_jn, sph_jnyn, lpmn
+from . import f_utils
 
 # (r, theta, phi)
 class spherical_utilities(object):
@@ -22,7 +22,7 @@ class spherical_utilities(object):
         self.ctgt = 1 / self.tgt
 
     def set_funcs_ang(self):
-        P = array([special.lpmn(self.n, self.n, ct) for ct in self.cost])
+        P = array([lpmn(self.n, self.n, ct) for ct in self.cost])
         self.data_Ang, self.data_Angd = P[:, 0, :, :], P[:, 1, :, :]
 
     def set_all_layers(self, lab):
@@ -36,7 +36,7 @@ class spherical_utilities(object):
             kis = [0, bnd.k1, bnd.k2]
             for i in [1, 2]:
                 krs = kis[i] * r
-                JY = array([special.sph_jnyn(self.n, kr) for kr in krs])[:, :, :]
+                JY = array([sph_jnyn(self.n, kr) for kr in krs])[:, :, :]
                 Rad[i] = {'j': JY[:, 0, :], 'h': JY[:, 0, :] + 1j * JY[:, 2, :]}
                 Radd[i] = {'j': JY[:, 1, :], 'h': JY[:, 1, :] + 1j * JY[:, 3, :]}
 
@@ -93,11 +93,11 @@ class spherical_utilities(object):
 
 
 def get_Jn(n, x):
-    return array([special.sph_jn(n, xl) for xl in x])
+    return array([sph_jn(n, xl) for xl in x])
 
 
 def get_JnHn(n, x):
-    JnYn = array([special.sph_jnyn(n, xl) for xl in x])
+    JnYn = array([sph_jnyn(n, xl) for xl in x])
     return JnYn[:, :2, :], JnYn[:, :2, :] + 1j * JnYn[:, 2:, :]
 
 
@@ -173,59 +173,59 @@ def matG0(C, m, jh, i, coef):
     return f_utils.mat_g0(ki, Rad, Radd, Angm, Angmd, C.r, C.rd, C.sint, coef, C.weights)
 
 
-def matD(C, m, jh, i, e12, B=None):
+def matD(C, m, jh, i , e12, B=None):
     if B is None: B = matB(C, m, jh, i)
     fd = C.rdr
     D0 = matD0(C, m, jh, i, coef=fd)
     return B + (e12 - 1.) * D0
 
 
-def matE(C, m, jh, i, e12):
+def matE(C, m, jh, i , e12):
     fe = C.rd
     E0 = matE0(C, m, jh, i, coef=fe)
     return (e12 - 1.) * E0
 
 
-def matF(C, m, jh, i, e12):
+def matF(C, m, jh, i , e12):
     fd = (C.rd * C.cost - C.r * C.sint) / C.r ** 2
     D0 = matD0(C, m, jh, i, coef=fd)
     return -(e12 - 1.) * D0
 
 
-def matG(C, m, jh, i, e12, B=None):
+def matG(C, m, jh, i , e12, B=None):
     if B is None: B = matB(C, m, jh, i)
     fe = (C.rd * C.cost - C.r * C.sint) / C.r
     E0 = matE0(C, m, jh, i, coef=fe)
     return B - (e12 - 1.) * E0
 
 
-def matA12(C, m, jh, i, e21, A=None):
+def matA12(C, m, jh, i , e21, A=None):
     if A is None: A = matA(C, m, jh, i)
     fa = C.r * (C.rd * C.cost - C.r * C.sint) / C.r2rd2
     A0 = matA0(C, m, jh, i, coef=fa)
     return A - (e21 - 1) * A0
 
 
-def matA14(C, m, jh, i, e21):
+def matA14(C, m, jh, i , e21):
     fa = (C.r ** 2 * C.rd) / C.r2rd2
     A0 = matA0(C, m, jh, i, coef=fa)
     return -(e21 - 1) * A0
 
 
-def matA32(C, m, jh, i, e21):
+def matA32(C, m, jh, i , e21):
     fa = (C.rd * C.sint + C.r * C.cost) * (C.rd * C.cost - C.r * C.sint) / (C.r * C.r2rd2)
     A0 = matA0(C, m, jh, i, coef=fa)
     return (e21 - 1) * A0
 
 
-def matA34(C, m, jh, i, e21, A=None):
+def matA34(C, m, jh, i , e21, A=None):
     if A is None: A = matA(C, m, jh, i)
     fa = C.rd * (C.rd * C.sint + C.r * C.cost) / C.r2rd2
     A0 = matA0(C, m, jh, i, coef=fa)
     return A + (e21 - 1) * A0
 
 
-def matA22(C, m, jh, i, e21, B=None):
+def matA22(C, m, jh, i , e21, B=None):
     if B is None: B = matB(C, m, jh, i)
     fg = C.rd * (C.rd * C.cost - C.r * C.sint) / C.r2rd2
     fa = (C.r ** 2 - C.r * C.rdd + 2 * C.rd ** 2)\
@@ -237,7 +237,7 @@ def matA22(C, m, jh, i, e21, B=None):
     return B - (e21 - 1) * (G0 - A0)
 
 
-def matA24(C, m, jh, i, e21):
+def matA24(C, m, jh, i , e21):
     fg = C.r * C.rd ** 2 / C.r2rd2
     fa = C.rd * (C.r ** 4 - 2 * C.r ** 3 * C.rdd + 2 * C.r ** 2 * C.rd ** 2 - C.rd ** 4)\
     / (C.r2rd2) ** 2
@@ -247,7 +247,7 @@ def matA24(C, m, jh, i, e21):
     return -(e21 - 1) * (G0 - A0)
 
 
-def matA42(C, m, jh, i, e21):
+def matA42(C, m, jh, i , e21):
     fg = (C.rd * C.cost - C.r * C.sint) ** 2 / (C.r * C.r2rd2)
     fa = 2 * (C.r ** 2 - C.r * C.rdd + 2 * C.rd ** 2)\
          * (C.rd * C.cost - C.r * C.sint) * (C.rd * C.sint + C.r * C.cost)\
@@ -258,7 +258,7 @@ def matA42(C, m, jh, i, e21):
     return (e21 - 1) * (G0 - A0)
 
 
-def matA44(C, m, jh, i, e21, B=None):
+def matA44(C, m, jh, i , e21, B=None):
     if B is None: B = matB(C, m, jh, i)
     fg = C.rd * (C.rd * C.cost - C.r * C.sint) / C.r2rd2
     fa = ((C.r ** 3 * C.rdd + C.r ** 2 * C.rd ** 2 - C.r * C.rd ** 2 * C.rdd + 3 * C.rd ** 4) * C.sint\
@@ -271,7 +271,7 @@ def matA44(C, m, jh, i, e21, B=None):
 
 ############### EBCM #############################
 
-def mat_ebcm_axi_tm(C, m, jh1, jh2, e12, e21):
+def mat_ebcm_axi_tm(C, m, jh1, jh2 , e12 , e21):
     k1 = C.ki[1]
     k2 = C.ki[2]
     Rad1 = C.Rad(m, jh1, 1)
@@ -281,10 +281,10 @@ def mat_ebcm_axi_tm(C, m, jh1, jh2, e12, e21):
     Angm = C.Ang(m)
     Angmd = C.Angd(m)
     return f_utils.axitm(Rad1, Radd1, Rad2, Radd2, Angm, Angmd,\
-                         C.r, C.rd, C.sint, C.cost, k1, k2, e12, C.weights)
+                         C.r, C.rd, C.sint, C.cost, k1, k2 , e12, C.weights)
 
 
-def mat_ebcm_axi_te(C, m, jh1, jh2, e12, e21):
+def mat_ebcm_axi_te(C, m, jh1, jh2 , e12 , e21):
     k1 = C.ki[1]
     k2 = C.ki[2]
     Rad1 = C.Rad(m, jh1, 1)
@@ -297,7 +297,7 @@ def mat_ebcm_axi_te(C, m, jh1, jh2, e12, e21):
                          C.r, C.rd, C.sint, C.cost, k1, k2, C.weights)
 
 
-def mat_ebcm_naxi_tm(C, m, jh1, jh2, e12, e21):
+def mat_ebcm_naxi_tm(C, m, jh1, jh2 , e12 , e21):
     k1 = C.ki[1]
     k2 = C.ki[2]
     Rad1 = C.Rad(m, jh1, 1)
@@ -307,10 +307,10 @@ def mat_ebcm_naxi_tm(C, m, jh1, jh2, e12, e21):
     Angm = C.Ang(m)
     Angmd = C.Angd(m)
     return f_utils.naxitm(m, Rad1, Radd1, Rad2, Radd2, Angm, Angmd,\
-                          C.r, C.rd, C.sint, C.cost, k1, k2, e12, e21, C.weights)
+                          C.r, C.rd, C.sint, C.cost, k1, k2 , e12 , e21, C.weights)
 
 
-def mat_ebcm_naxi_te(C, m, jh1, jh2, e12, e21):
+def mat_ebcm_naxi_te(C, m, jh1, jh2 , e12 , e21):
     k1 = C.ki[1]
     k2 = C.ki[2]
     Rad1 = C.Rad(m, jh1, 1)
@@ -320,11 +320,11 @@ def mat_ebcm_naxi_te(C, m, jh1, jh2, e12, e21):
     Angm = C.Ang(m)
     Angmd = C.Angd(m)
     return f_utils.naxite(m, Rad1, Radd1, Rad2, Radd2, Angm, Angmd,\
-                          C.r, C.rd, C.rdd, C.sint, C.cost, k1, k2, e12, e21, C.weights)
+                          C.r, C.rd, C.rdd, C.sint, C.cost, k1, k2 , e12 , e21, C.weights)
 
 ################### PMM ####################################
 
-def mat_pmm_axi_tm(C, e12, xv):
+def mat_pmm_axi_tm(C , e12, xv):
     m = 1
     k1 = C.ki[1]
     k2 = C.ki[2]
@@ -341,10 +341,10 @@ def mat_pmm_axi_tm(C, e12, xv):
     RadjR = ones(shape(Radj1[1]))
     RadhR = ones(shape(Radj1[1]))
     return f_utils.pmmaxitm(Radj1, Raddj1, Radj2, Raddj2, Radh1, Raddh1, Angm, Angmd,\
-                            RadjR, RadhR, C.r, C.rd, C.sint, C.ctgt, k1, k2, e12, C.weights)
+                            RadjR, RadhR, C.r, C.rd, C.sint, C.ctgt, k1, k2 , e12, C.weights)
 
 
-def mat_pmm_naxi_tm(C, m, e12, xv):
+def mat_pmm_naxi_tm(C, m , e12, xv):
     k1 = C.ki[1]
     k2 = C.ki[2]
     Radj1 = C.Rad(m, 'j', 1)
@@ -360,5 +360,5 @@ def mat_pmm_naxi_tm(C, m, e12, xv):
     RadjR = ones(shape(Radj1[1]))
     RadhR = ones(shape(Radj1[1]))
     return f_utils.pmmnaxitm(Radj1, Raddj1, Radj2, Raddj2, Radh1, Raddh1, Angm, Angmd,\
-                             RadjR, RadhR, C.r, C.rd, C.sint, C.cost, k1, k2, e12, C.weights)
+                             RadjR, RadhR, C.r, C.rd, C.sint, C.cost, k1, k2 , e12, C.weights)
 

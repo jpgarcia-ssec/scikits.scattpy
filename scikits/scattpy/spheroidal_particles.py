@@ -1,6 +1,6 @@
 from scipy import *
 
-import spheroidal
+from . import spheroidal
 
 class Spheroid(object):
 
@@ -10,7 +10,7 @@ class Spheroid(object):
         elif type == -1:
             self.psi = 1.0 / sqrt(a_b * a_b - 1.0)
         else:
-            print "Invalid value of type. Should be 1 or -1."
+            print("Invalid value of type. Should be 1 or -1.")
 
         self.spheroid = True
 
@@ -26,7 +26,7 @@ class Spheroid(object):
         elif self.type == -1:
             self.c1 = xl / sqrt(self.psi * self.psi + 1.0)
         else:
-            print "Invalid value of type. Should be 1 or -1. Current value is "+str(self.type)
+            print("Invalid value of type. Should be 1 or -1. Current value is "+str(self.type))
         self.xv = self.c1 * pow(self.psi * (self.psi * self.psi - self.type),1.0/3.0)
         self.initialize()
 
@@ -38,7 +38,7 @@ class Spheroid(object):
         elif self.type == -1:
             self.xl = self.c1 * sqrt(self.psi * self.psi + 1.0)
         else:
-            print "Invalid value of type. Should be 1 or -1."
+            print("Invalid value of type. Should be 1 or -1.")
         self.initialize()
 
     def initialize(self):

@@ -5,7 +5,7 @@ LAB=Lab(P, pi/4)
 RES=ebcm(LAB)
 
 Csca_tm,Qsca_tm = LAB.get_Csca(RES.c_sca_tm)
-print Csca_tm,Qsca_tm
+print(Csca_tm,Qsca_tm)
 Theta = linspace(0,pi,1000)
 A = LAB.get_amplitude_matrix(RES.c_sca_tm,RES.c_sca_te,Theta,0)
 S11g,S21_S11 = LAB.get_int_plr(A)

@@ -2,8 +2,8 @@ import scipy.special as special
 
 from numpy.lib.scimath import sqrt
 
-import f_spheroid
-import f_radial
+from . import f_spheroid
+from . import f_radial
 
 # ---- Calculation of norm for spheroidal angular functions ----
 
@@ -22,9 +22,9 @@ def get_norm_cv(m, n, c, cv, type):
 
     while (k < d.shape[0]):
         if (type == 1):
-            value = d[k / 2] * d[k / 2] / (2.0 * k + 2.0 * m + 1.0) * get_norm_factorial(k, m)
+            value = d[k // 2] * d[k // 2] / (2.0 * k + 2.0 * m + 1.0) * get_norm_factorial(k, m)
         else:
-            value = d[k / 2] * d[k / 2] / (2.0 * k + 2.0 * m + 1.0) * get_norm_factorial(k, m)
+            value = d[k // 2] * d[k // 2] / (2.0 * k + 2.0 * m + 1.0) * get_norm_factorial(k, m)
         sum += value
         k += 2
 
@@ -33,7 +33,7 @@ def get_norm_cv(m, n, c, cv, type):
     return sum
 
 def get_norm_factorial(k, m):
-    fact = 1l
+    fact = 1
     for i in range(1, 2 * m + 1):
         fact *= k + i
     return fact

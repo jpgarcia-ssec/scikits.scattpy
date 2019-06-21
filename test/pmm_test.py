@@ -1,10 +1,10 @@
 import unittest
 
-from spheroidal_particles import *
-from properties import *
+from scikits.scattpy.spheroidal_particles import *
+from scikits.scattpy.properties import *
 
 #main integration tests for non-absorbing particle
-from spheroidal_pmm import SpheroidalPMM
+from scikits.scattpy.spheroidal_pmm import SpheroidalPMM
 
 class testPMM(unittest.TestCase):
 
@@ -18,9 +18,9 @@ class testPMM(unittest.TestCase):
         b_sca = pmm.getSolution(TMInputWave(alpha))[0]
         C_ext = getCext(particle, alpha, b_sca, nmax)[0]
         C_sca = getCsca(particle, b_sca, nmax)[0]
-        print C_ext, C_sca
+        print(C_ext, C_sca)
         delta = (C_ext-C_sca)/(C_ext+C_sca)
-        print delta
+        print(delta)
         self.assertAlmostEqual(delta,0,5)
         self.assertAlmostEqual(C_ext,C_sca,5)
         self.assertTrue(C_ext>0.)
@@ -36,9 +36,9 @@ class testPMM(unittest.TestCase):
         b_sca = pmm.getSolution(TMInputWave(alpha))[0]
         C_ext = getCext(particle, alpha, b_sca, nmax)[0]
         C_sca = getCsca(particle, b_sca, nmax)[0]
-        print C_ext, C_sca
+        print(C_ext, C_sca)
         delta = (C_ext-C_sca)/(C_ext+C_sca)
-        print delta
+        print(delta)
         self.assertAlmostEqual(delta,0,5)
         self.assertAlmostEqual(C_ext,C_sca,5)
         self.assertTrue(C_ext>0.)
@@ -54,9 +54,9 @@ class testPMM(unittest.TestCase):
         b_sca = pmm.getMatrixSolution(TMInputWave(alpha))[0]
         C_ext = getCext(particle, alpha, b_sca, nmax)[0]
         C_sca = getCsca(particle, b_sca, nmax)[0]
-        print C_ext, C_sca
+        print(C_ext, C_sca)
         delta = (C_ext-C_sca)/(C_ext+C_sca)
-        print delta
+        print(delta)
         self.assertAlmostEqual(delta,0,5)
         self.assertAlmostEqual(C_ext,C_sca,5)
         self.assertTrue(C_ext>0.)
@@ -72,9 +72,9 @@ class testPMM(unittest.TestCase):
         b_sca = pmm.getMatrixSolution(TMInputWave(alpha))[0]
         C_ext = getCext(particle, alpha, b_sca, nmax)[0]
         C_sca = getCsca(particle, b_sca, nmax)[0]
-        print C_ext, C_sca
+        print(C_ext, C_sca)
         delta = (C_ext-C_sca)/(C_ext+C_sca)
-        print delta
+        print(delta)
         self.assertAlmostEqual(delta,0,5)
         self.assertAlmostEqual(C_ext,C_sca,5)
         self.assertTrue(C_ext>0.)
